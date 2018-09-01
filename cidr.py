@@ -11,21 +11,24 @@ import ipaddress
 class CIDR(object):
     """ A class to wrap up cidr calculations """
     def __init__(self, verbose=False):
+        """ Initializer """
         self.verbose = verbose
 
     def show(self, *args, **kwargs):
+        """ Cheap wrapper around 'print' to support 'verbose' mode """
         if self.verbose:
             print(*args, **kwargs)
 
     @staticmethod
     def _mask(bits):
+        """ Return a bit mask for the given number of bits. """
         mask = 0
         for n in range(32):
             mask = (mask << 1) | (1 if n < bits else 0)
         return mask
 
     def cidr_subnets(self, iprange, sub_bits, offset=None):
-        ''' return the list of subnet addresses within the cidr range '''
+        """ return the list of subnet addresses within the cidr range """
         cidr_address, cidr_prefix = iprange.split('/')
         cidr_prefix = int(cidr_prefix)
         cidr_bits = 32 - cidr_prefix
@@ -43,7 +46,7 @@ class CIDR(object):
         return subnets[offset] if offset else subnets
 
     def cidr_addresses(self, base, prefix):
-        ''' return the list of addresses from the given base/prefix '''
+        """ return the list of addresses from the given base/prefix """
         cidr = '/'.join([base, str(prefix)])
         exploded = [str(a) for a in ipaddress.IPv4Network(cidr)]
         self.show("Subnet {}/{} has {} addresses".format(base,
@@ -53,6 +56,7 @@ class CIDR(object):
 
 
 def main(params):
+    """ Main code body """
     cidr = params['cidr']
     bits = params['bits']
     subnets = CIDR().cidr_subnets(cidr, bits)
@@ -60,8 +64,8 @@ def main(params):
     if params['offset']:
         print("{}".format(subnets[params['offset']]))
     else:
-        for sn in subnets:
-            print("  {}".format(sn))
+        for subnet in subnets:
+            print("  {}".format(subnet))
 
 
 if __name__ == "__main__":
